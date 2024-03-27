@@ -45,4 +45,5 @@ $ npm run test:cov
 6) Once uploaded, Admin should see total count, total duplicates & Unique phone-numbers found in the uploaded file
 7) User should be able to uplaod a file & see total count, total duplicates found in the uploaded file & Unique phone-numbers. Dont save these phonenumbers in DB. Only Admin adds numbers to DB
 8) User should be able to download the orignal file, Cleaned File(After removing duplicates), Duplicate File(All duplicate numbers)
+9) Use Mysql Database for this project
 
