@@ -1,4 +1,4 @@
-import { User } from 'src/auth/user.entity';
+import { User } from "src/auth/user.entity";
 import {
   Entity,
   Column,
@@ -6,14 +6,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-} from 'typeorm';
+} from "typeorm";
 
 @Entity()
 export class Uploads {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: null })
   fileName: string;
 
   @Column({ default: null })

@@ -1,18 +1,18 @@
-import { User } from 'src/auth/user.entity';
+import { User } from "src/auth/user.entity";
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
-} from 'typeorm';
+} from "typeorm";
 
 @Entity()
 export class Phonebook {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
+  @Column({ type: "varchar", length: 50, unique: true, default: null })
   phoneNumber: string;
 
   @CreateDateColumn()

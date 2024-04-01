@@ -1,14 +1,14 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import * as dotenv from 'dotenv';
-import { User } from 'src/auth/user.entity';
-import { Phonebook } from 'src/phonebook/phonebook.entity';
-import { Uploads } from 'src/uploads/uploads.entity';
+import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import * as dotenv from "dotenv";
+import { User } from "src/auth/user.entity";
+import { Phonebook } from "src/phonebook/phonebook.entity";
+import { Uploads } from "src/uploads/uploads.entity";
 dotenv.config();
 const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DATABASE_NAME } =
   process.env;
 
 export const databaseConfig: TypeOrmModuleOptions = {
-  type: 'mysql',
+  type: "mysql",
   host: DB_HOST,
   port: parseInt(DB_PORT),
   username: DB_USERNAME,
