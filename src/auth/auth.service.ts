@@ -19,15 +19,81 @@ export class AuthService {
   ) { }
 
   async login(email: string, password: string): Promise<any> {
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+
+      const token = jwt.sign(
+        {
+          user: {
+            role: user.role,
+            email: user.email,
+            id: user.id,
+          },
+        },
+        process.env.ACCESS_TOKEN_SECERT,
+        { expiresIn: "1h" }
+      );
+
+      return {
+        error: false,
+        token,
+        message: 'Login successfully',
+        id: user.id,
+        role: user.role
+      };
+
+    } else {
+      return {
+        error: true,
+        message: "email or password is not valid",
+      };
+
+    }
 
   }
 
-  async sendPasswordResetEmail(email: string, subject: string): Promise<any>  {
+  async sendPasswordResetEmail(email: string, subject: string): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
 
+    if (!user) {
+      return { error: true, message: 'User not found' };
+    }
+
+    const token = jwt.sign(
+      {
+        user: {
+          role: user.role,
+          email: user.email,
+          id: user.id,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECERT,
+      { expiresIn: "160m" }
+    );
+
+    await this.mailService.sendPasswordResetEmail(user, token, subject);
+
+    await this.userRepository.save(user);
+
+    return { error: false, message: 'Password reset email sent successfully' };
   }
 
-  async changePassword(id: string, password: string): Promise<any>  {
+  async changePassword(id: number, password: string): Promise<any> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
 
+    if (!user) {
+      return { error: true, message: 'User not found' };
+    }
+
+    user.password = hashedPassword;
+    await this.userRepository.save(user);
+    return { message: 'Password changed successfully' };
   }
 
   generatePassword(length: number = 12): string {
@@ -163,11 +229,12 @@ export class AuthService {
     }
   }
 
-  async downloadCsv(name: string, res): Promise<any>  {
+  async downloadCsv(name: string, res): Promise<any> {
 
   }
 
-  async deleteUser(id: number): Promise<void> {
-    
+  async deleteUser(id: number): Promise<any> {
+    await this.userRepository.delete({ id });
+    return { error: false, message: 'Admin user successfully created.' };
   }
 }

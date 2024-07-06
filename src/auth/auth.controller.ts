@@ -33,16 +33,16 @@ export class AuthController {
   @Post('forgetPassword')
   async sendPasswordResetEmail(
     @Body('email') email: string,
-  ): Promise<string | { message: string }> {
+  ) {
     const subject = "Reset your password";
     return await this.authService.sendPasswordResetEmail(email, subject);
   }
 
   @Post('changePassword')
   async changePassword(
-    @Body('id') id: string,
+    @Body('id') id: number,
     @Body('password') password: string,
-  ): Promise<string | { message: string }> {
+  ) {
     return await this.authService.changePassword(id, password);
   }
 
@@ -79,7 +79,7 @@ export class AuthController {
   async downloadCsv(
     @Param('name') name: string,
     @Res() res: Response,
-  ): Promise<string | { message: string }> {
+  )  {
     const cleanedName = name.replace(/^:/, '');
     return await this.authService.downloadCsv(cleanedName, res);
   }
