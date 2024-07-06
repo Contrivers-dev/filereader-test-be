@@ -22,11 +22,11 @@ export class AuthService {
 
   }
 
-  async sendPasswordResetEmail(email: string, subject: string) {
+  async sendPasswordResetEmail(email: string, subject: string): Promise<any>  {
 
   }
 
-  async changePassword(id: string, password: string) {
+  async changePassword(id: string, password: string): Promise<any>  {
 
   }
 
@@ -163,7 +163,7 @@ export class AuthService {
     }
   }
 
-  async downloadCsv(name: string, res) {
+  async downloadCsv(name: string, res): Promise<any>  {
 
   }
 

@@ -16,12 +16,12 @@ import { diskStorage } from 'multer';
 export class PhonebookController {
   constructor(private readonly phonebookService: PhonebookService) { }
 
-  @Post('adminUpload/:id')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage(),
-    }),
-  )
+  // @Post('adminUpload/:id')
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     storage: diskStorage(),
+  //   }),
+  // )
   async ImportCSV(
     @Param('id') id: number,
     @UploadedFile() file: Multer.File,
@@ -35,12 +35,12 @@ export class PhonebookController {
 
   }
 
-  @Post('userUpload/:id')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage(),
-    })
-  )
+  // @Post('userUpload/:id')
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     storage: diskStorage(),
+  //   })
+  // )
   async updateUserSheet(
     @Param('id') id: number,
     @UploadedFile() uploadedFile: Multer.File,
