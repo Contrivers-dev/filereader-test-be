@@ -18,6 +18,21 @@ export class PhonebookService {
     private readonly uploadsRepository: Repository<Uploads>,
   ) { }
 
+  async savePhoneNumber(phoneNumber: string, createdByUserId: number): Promise<Phonebook> {
+    const phonebookEntry = new Phonebook();
+    const user = await this.userRepository.findOneBy({ id: createdByUserId });
+    phonebookEntry.phoneNumber = phoneNumber;
+    phonebookEntry.createdBy = user;
+
+    return await this.phonebookRepository.save(phonebookEntry);
+  }
+
+  async savePhoneNumbers(phoneNumbers: string[], createdByUserId: number): Promise<void> {
+    for (const phoneNumber of phoneNumbers) {
+      await this.savePhoneNumber(phoneNumber, createdByUserId);
+    }
+  }
+
 
 }
 
