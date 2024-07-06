@@ -22,6 +22,7 @@ export class AuthController {
     @Body('email') email: string,
     @Body('password') password: string,
   ): Promise<string | { message: string }> {
+    
     return await this.authService.login(email, password);
   }
 
@@ -40,7 +41,7 @@ export class AuthController {
 
   @Post('changePassword')
   async changePassword(
-    @Body('id') id: string,
+    @Body('id') id: number,
     @Body('password') password: string,
   ): Promise<string | { message: string }> {
     return await this.authService.changePassword(id, password);

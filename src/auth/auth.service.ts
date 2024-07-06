@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import * as jwt from 'jsonwebtoken';
 import { Uploads } from 'src/uploads/uploads.entity';
 import { MailService } from 'src/mail/mail.service';
+import { UnauthorizedException,NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -19,15 +20,43 @@ export class AuthService {
   ) { }
 
   async login(email: string, password: string): Promise<any> {
+    try {
+      const user = await this.userRepository.findOne({ where: { email } });
+      if (!user) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
 
+      if (!isMatch) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+        const payload = { email: user.email, sub: user.id };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        return { message: 'Login successful', token };
+      
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
   }
 
   async sendPasswordResetEmail(email: string, subject: string): Promise<any>  {
 
   }
 
-  async changePassword(id: string, password: string): Promise<any>  {
-
+  async changePassword(id: number, password: string): Promise<any>  {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+      if (!user) {
+        return { error: true, message: 'User not found' };
+      }
+  
+      user.password = await bcrypt.hash(password, 10);
+      await this.userRepository.save(user);
+  
+      return { error: false, message: 'Password updated successfully' };
+    } catch (error) {
+      return { error: true, message: error.message };
+    }
   }
 
   generatePassword(length: number = 12): string {
@@ -168,6 +197,10 @@ export class AuthService {
   }
 
   async deleteUser(id: number): Promise<void> {
-    
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.remove(user);
   }
 }
