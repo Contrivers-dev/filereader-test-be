@@ -6,21 +6,21 @@ import { User } from "../auth/user.entity";
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendPasswordResetEmail(user: User, jwtTokwn: string, subject: string) {
-    const url = `${process.env.APP_URL}/forget-password/${jwtTokwn}`;
-    await this.mailerService
-      .sendMail({
-        to: user.email,
+  async sendPasswordResetEmail(email, jwtToken: string, subject: string) {
+    const url = `${process.env.APP_URL}/forget-password/${jwtToken}`;
+    const message = `Welcome to Phone validator.\n\nHere is the URL to reset your password: ${url}`;
+    
+    try {
+      await this.mailerService.sendMail({
+        to: email,
         subject: subject,
-       
-        context: {
-          name: user.name,
-          url,
-        },
-      })
-      .catch((e) => {
-        console.log(e);
+        text: message,
       });
+      console.log(`Password reset email sent successfully to ${email}`);
+    } catch (error) {
+      console.error(`Failed to send password reset email to ${email}`, error);
+      throw new Error(`Failed to send password reset email to ${email}`);
+    }
   }
   async sendEmail(email: string, subject: string) {
     console.log(email);

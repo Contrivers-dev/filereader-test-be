@@ -66,7 +66,8 @@ export class AuthService {
       console.log("making url ");
       const url = `http://localhost:8000/auth/reset?token=${token}`;
       console.log(url);
-      return { token: token };
+       this.mailService.sendPasswordResetEmail(email,token,"Password Reset");
+      return { message:"Successfull" };
     } catch (error) {
       console.error("Error occurred while searching for user:", error);
       return { error: "NOt successfull" };
