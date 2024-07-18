@@ -18,53 +18,50 @@ export class PhonebookService {
   ) {}
 
   async importUniquePhoneNumbers(uniquePhoneNumbers: string[], userId: number) {
-    console.log(uniquePhoneNumbers);
+    console.log("Incoming unique phone numbers:", uniquePhoneNumbers);
+
+    
     const existingPhoneNumbers = await this.phonebookRepository
       .createQueryBuilder("phonebook")
       .select("phonebook.phoneNumber")
       .getMany();
-    console.log("Here optimizing it a little bit to improve the performance");
+      
+
     const existingPhoneNumberSet = new Set(
       existingPhoneNumbers.map((entry) => entry.phoneNumber)
     );
-    console.log("Out of loop");
-    const newPhoneNumbers = uniquePhoneNumbers.filter(
-      (phone) => !existingPhoneNumberSet.has(phone)
+
+    
+    const filteredUniquePhoneNumbers = uniquePhoneNumbers.filter(
+      (phone) => existingPhoneNumberSet.has(phone)
     );
-    console.log("new phone numnbers");
-    // const phonebookEntries = newPhoneNumbers.map((number) => {
-    //   const entry = new Phonebook();
-    //   entry.phoneNumber = number;
-    //   entry.createdBy = { id: userId } as User;
-    //   return entry;
-    // });
-    console.log("Declaring new loop");
-    const phonebookEntries: Phonebook[] = [];
-    console.log("Now creating new foreach loop");
-    newPhoneNumbers.forEach((number) => {
+
+    console.log("Filtered unique phone numbers:", filteredUniquePhoneNumbers);
+
+        const phonebookEntries = filteredUniquePhoneNumbers.map((number) => {
       const entry = new Phonebook();
       entry.phoneNumber = number;
       entry.createdBy = { id: userId } as User;
-      phonebookEntries.push(entry);
+      return entry;
     });
-    console.log("Now creating new foreach loop");
-    if (phonebookEntries.length > 0) {
-      console.log("saving data");
-      // await this.phonebookRepository.save(phonebookEntries);
-      const batchSize = 1000; // Define a reasonable batch size
 
-      for (let i = 0; i < phonebookEntries.length; i += batchSize) {
-        const batch = phonebookEntries.slice(i, i + batchSize);
-        await this.phonebookRepository.save(batch);
+    try {
+      if (phonebookEntries.length > 0) {
+        console.log("Saving data...");
+        await this.phonebookRepository.save(phonebookEntries);
+        console.log("Saved successfully");
+      } else {
+        console.log("No new unique phone numbers to save.");
       }
-
-      console.log("saved successfully");
+    } catch (error) {
+      console.error("Error saving phonebook entries:", error);
+      throw error; // Rethrow the error or handle it as needed
     }
 
     return {
       total: uniquePhoneNumbers.length,
-      duplicates: uniquePhoneNumbers.length - newPhoneNumbers.length,
-      unique: newPhoneNumbers.length,
+      duplicates: uniquePhoneNumbers.length - filteredUniquePhoneNumbers.length,
+      unique: filteredUniquePhoneNumbers.length,
     };
   }
   async saveUploadDetails(details: {
