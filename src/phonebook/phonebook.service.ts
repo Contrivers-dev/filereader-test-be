@@ -31,14 +31,19 @@ export class PhonebookService {
       existingPhoneNumbers.map((entry) => entry.phoneNumber)
     );
 
+
+    console.log("Exisiting phone numbers in db");
+    console.log(existingPhoneNumberSet);
     
     const filteredUniquePhoneNumbers = uniquePhoneNumbers.filter(
-      (phone) => existingPhoneNumberSet.has(phone)
+      (phone) => !existingPhoneNumberSet.has(phone)
     );
 
-    console.log("Filtered unique phone numbers:", filteredUniquePhoneNumbers);
+     console.log("Unique numbers that are going to be entered");
+     console.log(filteredUniquePhoneNumbers);
 
-        const phonebookEntries = filteredUniquePhoneNumbers.map((number) => {
+   
+      const phonebookEntries = filteredUniquePhoneNumbers.map((number) => {
       const entry = new Phonebook();
       entry.phoneNumber = number;
       entry.createdBy = { id: userId } as User;

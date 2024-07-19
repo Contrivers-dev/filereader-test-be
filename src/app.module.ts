@@ -5,7 +5,6 @@ import { AuthModule } from "./auth/auth.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { databaseConfig } from "./config/database.config";
 import { PhonebookModule } from "./phonebook/phonebook.module";
-import { MailController } from "./test.controller";
 import { MailModule } from "./mail/mail.module";
 @Module({
   imports: [
@@ -14,7 +13,7 @@ import { MailModule } from "./mail/mail.module";
     PhonebookModule,
     TypeOrmModule.forRoot(databaseConfig),
   ],
-  controllers: [AppController, MailController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

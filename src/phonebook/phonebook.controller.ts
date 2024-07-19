@@ -239,11 +239,14 @@ export class PhonebookController {
     }
   }
 
+ normalizePhoneNumber(phoneNumber: any): string {
+    return phoneNumber.toString().padStart(10, '0');
+  }
   uploadCsvStream(filePath: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
       const phoneNumbers: string[] = [];
-      const headerValueMap: { [key: string]: string[] } = {};
-
+      const chunkSize=3000;
+      let buffer:string[]=[];
       fs.createReadStream(filePath)
         .pipe(csvParser())
         .on("data", (data: any) => {
@@ -251,12 +254,19 @@ export class PhonebookController {
             if (
               /phone_number|telephone|Telephone|cell|mobile|contact/i.test(h)
             ) {
-              phoneNumbers.push(data[h]);
+
+                buffer.push(data[h]);
+            }
+
+            if(buffer.length>=chunkSize){
+              phoneNumbers.push(...buffer);
+              buffer=[];
             }
           });
         })
         .on("end", () => {
           console.log("CSV file successfully processed");
+         phoneNumbers.push(...buffer);
           resolve(phoneNumbers);
         })
         .on("error", (error) => {
@@ -264,6 +274,7 @@ export class PhonebookController {
         });
     });
   }
+
 
   uploadExcelStream(filePath: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -273,16 +284,29 @@ export class PhonebookController {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const jsonData = xlsx.utils.sheet_to_json(sheet);
+        const chunkSize = 1000; 
+        let buffer: string[] = [];
 
         jsonData.forEach((data) => {
           Object.keys(data).forEach((h) => {
             if (
               /phone_number|telephone|Telephone|cell|mobile|contact/i.test(h)
             ) {
-              phoneNumbers.push(data[h]);
+              
+              buffer.push(this.normalizePhoneNumber(data[h]));
+
+
             }
+            if(buffer.length>=chunkSize){
+              phoneNumbers.push(...buffer);
+              buffer=[];
+            }
+
           });
         });
+        if (buffer.length > 0) {
+          phoneNumbers.push(...buffer);
+        }
         console.log("Excel file successfully processed");
         resolve(phoneNumbers);
       } catch (error) {
