@@ -51,12 +51,12 @@ export class PhonebookService {
     });
 
     try {
-      if (phonebookEntries.length > 0) {
-        console.log("Saving data...");
-        await this.phonebookRepository.save(phonebookEntries);
-        console.log("Saved successfully");
-      } else {
-        console.log("No new unique phone numbers to save.");
+      const batchSize = 10000; 
+      for (let i = 0; i < phonebookEntries.length; i += batchSize) {
+        const batch = phonebookEntries.slice(i, i + batchSize);
+        console.log(`Saving batch ${i / batchSize + 1} with ${batch.length} entries...`);
+        await this.phonebookRepository.save(batch);
+        console.log(`Batch ${i / batchSize + 1} saved successfully.`);
       }
     } catch (error) {
       console.error("Error saving phonebook entries:", error);
