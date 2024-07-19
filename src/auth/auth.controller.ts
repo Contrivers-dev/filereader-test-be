@@ -105,11 +105,23 @@ export class AuthController {
 
   @Delete("user/:id")
   async deleteUser(
-    @Param("id") id: number
+    @Param("id") id: string,
+    @Req() request: Request
   ): Promise<string | { message: string }> {
     try {
-      await this.authService.deleteUser(id);
-      return { message: "User deleted successfully" };
+      console.log("in delete request");
+      const role = request["user"].role;
+      console.log("role");
+      const newId = parseInt(id);
+      if (role === "admin") {
+        console.log("Admin found successfully!");
+        return await this.authService.deleteUser(newId);
+      } else {
+        throw new HttpException(
+          "Unauthorized to perform this action",
+          HttpStatus.UNAUTHORIZED
+        );
+      }
     } catch (error) {
       return { message: "Failed to delete user" };
     }

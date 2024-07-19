@@ -30,7 +30,8 @@ export class AuthModule {
         "auth/createUser",
         "auth/all-sheets",
         "auth/all-users",
-        "auth/changePassword"
+        "auth/changePassword",
+        "auth/user/:id"
       );
     consumer
       .apply(express.static("uploadedFiles"))

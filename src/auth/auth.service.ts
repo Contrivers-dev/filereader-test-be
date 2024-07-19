@@ -7,7 +7,6 @@ import { MongoCompatibilityError, Repository } from "typeorm";
 import * as jwt from "jsonwebtoken";
 import { Uploads } from "src/uploads/uploads.entity";
 import { MailService } from "src/mail/mail.service";
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,6 +14,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Uploads)
     private readonly phonebookRepository: Repository<Uploads>,
+    @InjectRepository(Uploads)
+    private readonly uploadsRepository: Repository<Uploads>,
     private mailService: MailService
   ) {}
 
@@ -66,8 +67,8 @@ export class AuthService {
       console.log("making url ");
       const url = `http://localhost:8000/auth/reset?token=${token}`;
       console.log(url);
-       this.mailService.sendPasswordResetEmail(email,token,"Password Reset");
-      return { message:"Successfull" };
+      this.mailService.sendPasswordResetEmail(email, token, "Password Reset");
+      return { message: "Successfull" };
     } catch (error) {
       console.error("Error occurred while searching for user:", error);
       return { error: "NOt successfull" };
@@ -227,5 +228,20 @@ export class AuthService {
 
   async downloadCsv(name: string, res): Promise<any> {}
 
-  async deleteUser(id: number): Promise<void> {}
+  async deleteUser(id: number): Promise<any> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+      if (!user) {
+        return { error: true, message: "User does not exist " };
+      }
+
+      await this.uploadsRepository.delete({ createdBy: { id } });
+
+      await this.userRepository.delete(id);
+
+      return { error: false, message: "User deleted successfully." };
+    } catch (error) {
+      return { error: error, message: "not found" };
+    }
+  }
 }
